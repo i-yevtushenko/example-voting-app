@@ -9,14 +9,6 @@ on:
       - result/**
       - worker/**
       - .github/workflows/build-images.yaml
-  pull_request:
-    branches:
-      - main
-    paths:
-      - vote/**
-      - result/**
-      - worker/**
-      - .github/workflows/build-images.yaml
 
 env:
   REGISTRY: ghcr.io
