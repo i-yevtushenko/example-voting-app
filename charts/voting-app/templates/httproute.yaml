@@ -41,10 +41,9 @@ spec:
     {{- toYaml .Values.httpRoute.parentRefs | nindent 4 }}
   rules:
     - backendRefs:
-        - group: ""
-          kind: Service
-          name: {{ include "voting-app.fullname" . }}-result
-          port: {{ .Values.result.service.port }}
+        - group: traefik.io
+          kind: TraefikService
+          name: {{ include "voting-app.fullname" . }}-result-sticky
           weight: 1
       matches:
         - path:

@@ -1,0 +1,21 @@
+apiVersion: traefik.io/v1alpha1
+kind: TraefikService
+metadata:
+  name: {{ include "voting-app.fullname" . }}-result-sticky
+  labels:
+    {{- include "voting-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: result
+  annotations:
+    {{- include "voting-app.syncWave" "2" | nindent 4 }}
+spec:
+  weighted:
+    services:
+      - name: {{ include "voting-app.fullname" . }}-result
+        port: {{ .Values.result.service.port }}
+        weight: 1
+    sticky:
+      cookie:
+        name: result-io
+        httpOnly: true
+        secure: true
+        sameSite: none

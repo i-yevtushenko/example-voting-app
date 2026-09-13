@@ -16,7 +16,7 @@ vote:
     nodePort: 31000
 
 result:
-  replicaCount: 1
+  replicaCount: 2
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
     tag: latest
