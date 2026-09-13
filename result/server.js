@@ -1,12 +1,24 @@
 var express = require('express'),
     async = require('async'),
+    fs = require('fs'),
+    path = require('path'),
     { Pool } = require('pg'),
     cookieParser = require('cookie-parser'),
     app = express(),
     server = require('http').Server(app),
     io = require('socket.io')(server);
 
-var port = process.env.PORT || 4000;
+var webConfig = {};
+var webConfigPath = process.env.RESULT_CONFIG || '/etc/result/server.json';
+try {
+  webConfig = JSON.parse(fs.readFileSync(webConfigPath, 'utf8'));
+} catch (err) {
+  if (err.code !== 'ENOENT') {
+    console.error('Failed to read web server config', webConfigPath, err);
+  }
+}
+
+var port = webConfig.port || process.env.PORT || 4000;
 
 io.on('connection', function (socket) {
 

@@ -62,9 +62,12 @@ result:
       durationSeconds: 3600
   configMap:
     enabled: true
-    env:
-      PORT: "80"
-      NODE_ENV: production
+    mountPath: /etc/result
+    data:
+      server.json: |
+        {
+          "port": 80
+        }
 
 worker:
   enabled: true
