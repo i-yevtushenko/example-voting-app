@@ -13,9 +13,9 @@ spec:
       - name: {{ include "voting-app.fullname" . }}-result
         port: {{ .Values.result.service.port }}
         weight: 1
-    sticky:
-      cookie:
-        name: result-io
-        httpOnly: true
-        secure: true
-        sameSite: none
+        sticky:
+          cookie:
+            name: result-io
+            httpOnly: true
+            secure: true
+            sameSite: none
