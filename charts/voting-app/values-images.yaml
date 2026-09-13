@@ -2,12 +2,12 @@
 vote:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/vote
-    tag: 5607f49
+    tag: cce2284
 result:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
-    tag: 5607f49
+    tag: cce2284
 worker:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/worker
-    tag: 5607f49
+    tag: cce2284
