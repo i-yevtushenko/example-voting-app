@@ -39,7 +39,7 @@ argocd.argoproj.io/sync-wave: {{ . | quote }}
 {{- end }}
 
 {{- define "voting-app.image" -}}
-{{- $tag := default .root.Chart.AppVersion .component.image.tag }}
+{{- $tag := default .root.Chart.AppVersion .component.image.tag | toString }}
 {{- printf "%s:%s" .component.image.repository $tag }}
 {{- end }}
 

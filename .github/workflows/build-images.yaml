@@ -21,7 +21,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      actions: write
     strategy:
       fail-fast: false
       matrix:
@@ -66,12 +65,6 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:${{ env.SHORT_SHA }}
             ${{ env.IMAGE }}:latest
-          cache-from: |
-            type=gha,scope=${{ matrix.image }}
-            type=registry,ref=${{ env.IMAGE }}:buildcache
-          cache-to: |
-            type=gha,mode=max,scope=${{ matrix.image }}
-            type=registry,ref=${{ env.IMAGE }}:buildcache,mode=max
 
   publish-values:
     name: Write root values.yaml tags
@@ -102,8 +95,8 @@ jobs:
           text = path.read_text()
           for name in ("vote", "result", "worker"):
               text = re.sub(
-                  rf"({name}:\n  image:\n    repository: )\S+(\n    tag: )\S+",
-                  rf"\g<1>{prefix}/{name}\g<2>{sha}",
+                  rf"({name}:\n  image:\n    repository: )\S+(\n    tag: )[\"']?\S+[\"']?",
+                  rf'\g<1>{prefix}/{name}\g<2>"{sha}"',
                   text,
                   count=1,
               )
