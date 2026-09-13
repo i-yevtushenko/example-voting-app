@@ -61,4 +61,6 @@ jobs:
           provenance: false
           sbom: false
           push: true
-          tags: ${{ env.IMAGE }}:${{ env.SHORT_SHA }}
+          tags: |
+            ${{ env.IMAGE }}:${{ env.SHORT_SHA }}
+            ${{ env.IMAGE }}:latest
