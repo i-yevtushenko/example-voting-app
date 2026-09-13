@@ -1,0 +1,10 @@
+apiVersion: v2
+name: app
+description: Generic voting-app workload (vote, result, or worker)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: voting-lib
+    version: 0.1.0
+    repository: "file://../voting-lib"

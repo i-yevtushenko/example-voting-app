@@ -1,77 +1,180 @@
 nameOverride: ""
 fullnameOverride: ""
 
-imagePullSecrets: []
-
-domains:
-  vote: vote.k8s.local
-  result: result.k8s.local
-
 vote:
+  enabled: true
   replicaCount: 2
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/vote
     tag: latest
     pullPolicy: IfNotPresent
+  containerPort: 80
+  portName: vote
+  env:
+    redis: true
   service:
+    enabled: true
     type: NodePort
     port: 8080
-    targetPort: 80
     nodePort: 31000
+  httpRoute:
+    enabled: true
+  configMap:
+    enabled: true
+    mountPath: /etc/gunicorn
+    command:
+      - gunicorn
+      - --config
+      - /etc/gunicorn/gunicorn.conf.py
+      - app:app
+    data:
+      gunicorn.conf.py: |
+        bind = "0.0.0.0:80"
+        workers = 4
+        keepalive = 0
+        accesslog = "-"
+        errorlog = "-"
+        capture_output = True
 
 result:
+  enabled: true
   replicaCount: 2
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
     tag: latest
     pullPolicy: IfNotPresent
+  containerPort: 80
+  portName: result
+  env:
+    postgres: true
   service:
+    enabled: true
     type: NodePort
     port: 8081
-    targetPort: 80
     nodePort: 31001
+  httpRoute:
+    enabled: true
+  stickiness:
+    enabled: true
+    cookieName: result-io
+    aws:
+      targetType: ip
+      durationSeconds: 3600
+  configMap:
+    enabled: true
+    env:
+      PORT: "80"
+      NODE_ENV: production
 
 worker:
+  enabled: true
   replicaCount: 2
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/worker
     tag: latest
     pullPolicy: IfNotPresent
+  containerPort: null
+  env:
+    postgres: true
+    redis: true
+  service:
+    enabled: false
+  httpRoute:
+    enabled: false
+  configMap:
+    enabled: false
+
+# In-cluster Postgres / Redis (groundhog2k community charts, not Bitnami).
+# Set both top-level and global.* so apps and subcharts stay in sync.
+db:
+  enabled: true
 
 redis:
   enabled: true
+  fullnameOverride: redis
   image:
     repository: redis
     tag: 7.4.11-alpine
     pullPolicy: IfNotPresent
-  service:
-    port: 6379
-  persistence:
-    storageClass: synology-iscsi-ssd
-    size: 1Gi
-    accessMode: ReadWriteOnce
+  customAnnotations:
+    argocd.argoproj.io/sync-wave: "1"
+  storage:
+    requestedSize: 1Gi
+    className: synology-iscsi-ssd
+    keepPvc: true
 
-db:
-  enabled: true
+postgres:
+  fullnameOverride: db
   image:
     repository: postgres
     tag: 17.11-alpine
     pullPolicy: IfNotPresent
-  service:
-    port: 5432
-  persistence:
-    storageClass: synology-iscsi-ssd
-    size: 1Gi
-    accessMode: ReadWriteOnce
+  useDeployment: true
+  # Official alpine image runs as uid 70, not the chart default 999.
+  podSecurityContext:
+    fsGroup: 70
+    supplementalGroups:
+      - 70
+  securityContext:
+    allowPrivilegeEscalation: false
+    privileged: false
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsGroup: 70
+    runAsUser: 70
+    capabilities:
+      drop:
+        - ALL
+  customAnnotations:
+    argocd.argoproj.io/sync-wave: "1"
+  settings:
+    existingSecret: voting-app-postgres
+    superuserPassword:
+      secretKey: root-password
+    pgDir: pgdata
+  extraScripts: voting-app-postgres-init
+  env:
+    - name: POSTGRES_APP_USER
+      valueFrom:
+        secretKeyRef:
+          name: voting-app-postgres
+          key: username
+    - name: POSTGRES_APP_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: voting-app-postgres
+          key: password
+  storage:
+    requestedSize: 1Gi
+    className: synology-iscsi-ssd
+    keepPvc: true
 
-httpRoute:
-  enabled: true
-  parentRefs:
-    - group: gateway.networking.k8s.io
-      kind: Gateway
-      name: traefik
-      namespace: traefik
-      sectionName: websecure
+global:
+  imagePullSecrets: []
+  domains:
+    vote: vote.k8s.local
+    result: result.k8s.local
+  db:
+    enabled: true
+    host: db
+    port: "5432"
+    secretName: voting-app-postgres
+    database: postgres
+  redis:
+    enabled: true
+    host: redis
+    port: "6379"
+    secretName: voting-app-redis
+  # traefik: HTTPRoute + TraefikService stickiness
+  # aws: HTTPRoute + TargetGroupConfiguration (controller/Gateway are cluster infra)
+  gateway:
+    provider: traefik
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: traefik
+        namespace: traefik
+        sectionName: websecure
 
 externalSecret:
   refreshInterval: 1h
@@ -79,7 +182,7 @@ externalSecret:
     kind: ClusterSecretStore
     name: akeyless
   remoteKey: /k8s/voting-app/postgres
-  targetName: ""
+  targetName: voting-app-postgres
   properties:
     username: username
     password: password
@@ -88,7 +191,7 @@ externalSecret:
     port: port
   redis:
     remoteKey: /k8s/voting-app/redis
-    targetName: ""
+    targetName: voting-app-redis
     properties:
       host: host
       port: port

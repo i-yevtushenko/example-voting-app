@@ -1,6 +1,33 @@
 apiVersion: v2
 name: voting-app
-description: Distributed voting app with vote, worker, result, Redis, and Postgres
+description: Umbrella chart — vote, result, worker, plus community Postgres and Redis
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
+dependencies:
+  - name: voting-lib
+    version: 0.1.0
+    repository: "file://../voting-lib"
+  - name: app
+    version: 0.1.0
+    repository: "file://../app"
+    alias: vote
+    condition: vote.enabled
+  - name: app
+    version: 0.1.0
+    repository: "file://../app"
+    alias: result
+    condition: result.enabled
+  - name: app
+    version: 0.1.0
+    repository: "file://../app"
+    alias: worker
+    condition: worker.enabled
+  - name: postgres
+    version: 1.6.8
+    repository: https://groundhog2k.github.io/helm-charts/
+    condition: db.enabled
+  - name: redis
+    version: 2.4.7
+    repository: https://groundhog2k.github.io/helm-charts/
+    condition: redis.enabled

@@ -1,0 +1,21 @@
+dependencies:
+- name: voting-lib
+  repository: file://../voting-lib
+  version: 0.1.0
+- name: app
+  repository: file://../app
+  version: 0.1.0
+- name: app
+  repository: file://../app
+  version: 0.1.0
+- name: app
+  repository: file://../app
+  version: 0.1.0
+- name: postgres
+  repository: https://groundhog2k.github.io/helm-charts/
+  version: 1.6.8
+- name: redis
+  repository: https://groundhog2k.github.io/helm-charts/
+  version: 2.4.7
+digest: sha256:4abca7198382e16f4544f74c16ab60a4666be3023c2b3a0459015ce14bb20d19
+generated: "2026-09-13T18:50:37.00291+02:00"

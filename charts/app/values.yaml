@@ -1,0 +1,50 @@
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+containerPort: 80
+portName: http
+
+env:
+  postgres: false
+  redis: false
+
+extraEnv: []
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  nodePort: null
+
+httpRoute:
+  enabled: false
+  hostname: ""
+  parentRefs: []
+  pathPrefix: /
+
+stickiness:
+  enabled: false
+  cookieName: sticky
+  aws:
+    targetType: ip
+    durationSeconds: 3600
+
+# Web-server ConfigMap (gunicorn, extra env, etc.)
+configMap:
+  enabled: false
+  mountPath: ""
+  command: []
+  args: []
+  data: {}
+  env: {}
+
+resources: {}

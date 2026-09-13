@@ -1,0 +1,6 @@
+dependencies:
+- name: voting-lib
+  repository: file://../voting-lib
+  version: 0.1.0
+digest: sha256:0d312771c93b4cb6bfdce3c79ea4fdc6ba1044e7d2e4cf9925f6cdc3fb363510
+generated: "2026-09-13T18:50:31.843919+02:00"

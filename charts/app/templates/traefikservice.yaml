@@ -1,0 +1,22 @@
+{{- if and .Values.httpRoute.enabled .Values.stickiness.enabled .Values.service.enabled (eq (include "voting-lib.gatewayProvider" .) "traefik") }}
+apiVersion: traefik.io/v1alpha1
+kind: TraefikService
+metadata:
+  name: {{ include "voting-lib.fullname" . }}-sticky
+  labels:
+    {{- include "voting-lib.labels" . | nindent 4 }}
+  annotations:
+    {{- include "voting-lib.syncWave" "2" | nindent 4 }}
+spec:
+  weighted:
+    services:
+      - name: {{ include "voting-lib.fullname" . }}
+        port: {{ .Values.service.port }}
+        weight: 1
+        sticky:
+          cookie:
+            name: {{ .Values.stickiness.cookieName }}
+            httpOnly: true
+            secure: true
+            sameSite: none
+{{- end }}

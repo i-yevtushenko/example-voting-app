@@ -1,0 +1,37 @@
+# AWS overlay. Use with values.yaml:
+#   helm template voting-app charts/voting-app -f values.yaml -f values-aws.yaml
+#
+# This chart does not install AWS Load Balancer Controller or its Gateway.
+# Install those on the cluster first, then point parentRefs at that Gateway.
+# Result stickiness is TargetGroupConfiguration on the Service (cookie -> pod).
+#
+# Hosted RDS / ElastiCache: db/redis stay off; put host/port (and Postgres
+# username/password) in Secrets Manager.
+
+db:
+  enabled: false
+
+redis:
+  enabled: false
+
+global:
+  db:
+    enabled: false
+  redis:
+    enabled: false
+  gateway:
+    provider: aws
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: alb
+        namespace: kube-system
+        sectionName: https
+
+externalSecret:
+  secretStore:
+    kind: ClusterSecretStore
+    name: aws-secretsmanager
+  remoteKey: voting-app/postgres
+  redis:
+    remoteKey: voting-app/redis

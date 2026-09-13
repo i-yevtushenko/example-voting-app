@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "voting-lib.fullname" . }}
+  labels:
+    {{- include "voting-lib.labels" . | nindent 4 }}
+  annotations:
+    {{- include "voting-lib.syncWave" "2" | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "voting-lib.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "voting-lib.selectorLabels" . | nindent 8 }}
+      {{- if .Values.configMap.enabled }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- end }}
+    spec:
+      {{- with include "app.imagePullSecrets" . }}
+      imagePullSecrets:
+        {{- . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ include "voting-lib.name" . }}
+          image: {{ include "voting-lib.image" .Values.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if and .Values.configMap.enabled .Values.configMap.command }}
+          command:
+            {{- toYaml .Values.configMap.command | nindent 12 }}
+          {{- end }}
+          {{- if and .Values.configMap.enabled .Values.configMap.args }}
+          args:
+            {{- toYaml .Values.configMap.args | nindent 12 }}
+          {{- end }}
+          {{- if or .Values.service.enabled .Values.containerPort }}
+          ports:
+            - name: {{ .Values.portName }}
+              containerPort: {{ .Values.containerPort }}
+          {{- end }}
+          env:
+            {{- if .Values.env.postgres }}
+            {{- include "voting-lib.postgresEnv" . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.env.redis }}
+            {{- include "voting-lib.redisEnv" . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if and .Values.configMap.enabled .Values.configMap.env }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "voting-lib.fullname" . }}
+          {{- end }}
+          {{- if and .Values.configMap.enabled .Values.configMap.mountPath .Values.configMap.data }}
+          volumeMounts:
+            - name: web-config
+              mountPath: {{ .Values.configMap.mountPath }}
+              readOnly: true
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- if and .Values.configMap.enabled .Values.configMap.mountPath .Values.configMap.data }}
+      volumes:
+        - name: web-config
+          configMap:
+            name: {{ include "voting-lib.fullname" . }}
+      {{- end }}

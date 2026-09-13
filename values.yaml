@@ -1,6 +1,4 @@
-domains:
-  vote: vote.k8s.local
-  result: result.k8s.local
+# Homelab overlay. Merge with charts/voting-app/values.yaml.
 
 db:
   enabled: true
@@ -8,30 +6,46 @@ db:
 redis:
   enabled: true
 
-# AWS example (Secrets Manager via External Secrets):
-# db:
-#   enabled: false
-# redis:
-#   enabled: false
-# externalSecret:
-#   secretStore:
-#     kind: ClusterSecretStore
-#     name: aws-secretsmanager
-#   remoteKey: voting-app/postgres
-#   redis:
-#     remoteKey: voting-app/redis
+global:
+  domains:
+    vote: vote.k8s.local
+    result: result.k8s.local
+  db:
+    enabled: true
+  redis:
+    enabled: true
+  gateway:
+    provider: traefik
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: traefik
+        namespace: traefik
+        sectionName: websecure
 
 vote:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/vote
+<<<<<<< HEAD
     tag: "879e328"
+=======
+    tag: "1562076"
+>>>>>>> 9c3459e (split chart)
 
 result:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
+<<<<<<< HEAD
     tag: "879e328"
+=======
+    tag: "1562076"
+>>>>>>> 9c3459e (split chart)
 
 worker:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/worker
+<<<<<<< HEAD
     tag: "879e328"
+=======
+    tag: "1562076"
+>>>>>>> 9c3459e (split chart)

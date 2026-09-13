@@ -8,8 +8,9 @@ on:
       - vote/**
       - result/**
       - worker/**
-      - charts/voting-app/**
+      - charts/**
       - .github/workflows/build-images.yaml
+      - values-aws.yaml
 
 env:
   REGISTRY: ghcr.io
@@ -151,11 +152,21 @@ jobs:
 
       - name: Package and push
         run: |
+          helm repo add groundhog2k https://groundhog2k.github.io/helm-charts/
+          helm repo update groundhog2k
+          helm dependency update charts/app
+          helm dependency update charts/voting-app
           mkdir -p dist
+          helm package charts/voting-lib --destination dist --version "${CHART_VERSION}" --app-version "${SHORT_SHA}"
+          helm package charts/app --destination dist --version "${CHART_VERSION}" --app-version "${SHORT_SHA}"
           helm package charts/voting-app --destination dist --version "${CHART_VERSION}" --app-version "${SHORT_SHA}"
           helm package charts/voting-app --destination dist --version "${CHART_VERSION}-${SHORT_SHA}" --app-version "${SHORT_SHA}"
+          helm push "dist/voting-lib-${CHART_VERSION}.tgz" "oci://${CHART_REPO}"
+          helm push "dist/app-${CHART_VERSION}.tgz" "oci://${CHART_REPO}"
           helm push "dist/voting-app-${CHART_VERSION}.tgz" "oci://${CHART_REPO}"
           helm push "dist/voting-app-${CHART_VERSION}-${SHORT_SHA}.tgz" "oci://${CHART_REPO}"
+          echo "Pushed oci://${CHART_REPO}/voting-lib:${CHART_VERSION}"
+          echo "Pushed oci://${CHART_REPO}/app:${CHART_VERSION}"
           echo "Pushed oci://${CHART_REPO}/voting-app:${CHART_VERSION}"
           echo "Pushed oci://${CHART_REPO}/voting-app:${CHART_VERSION}-${SHORT_SHA}"
 

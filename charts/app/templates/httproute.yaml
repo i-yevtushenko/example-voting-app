@@ -1,0 +1,39 @@
+{{- if and .Values.httpRoute.enabled .Values.service.enabled }}
+{{- $hostname := include "app.hostname" . }}
+{{- if not $hostname }}
+{{- fail "httpRoute.hostname or global.domains.<name> is required when httpRoute.enabled is true" }}
+{{- end }}
+{{- $provider := include "voting-lib.gatewayProvider" . }}
+{{- $stickyTraefik := and .Values.stickiness.enabled (eq $provider "traefik") }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "voting-lib.fullname" . }}
+  labels:
+    {{- include "voting-lib.labels" . | nindent 4 }}
+  annotations:
+    {{- include "voting-lib.syncWave" "3" | nindent 4 }}
+spec:
+  hostnames:
+    - {{ $hostname | quote }}
+  parentRefs:
+    {{- include "app.parentRefs" . | nindent 4 }}
+  rules:
+    - backendRefs:
+        {{- if $stickyTraefik }}
+        - group: traefik.io
+          kind: TraefikService
+          name: {{ include "voting-lib.fullname" . }}-sticky
+          weight: 1
+        {{- else }}
+        - group: ""
+          kind: Service
+          name: {{ include "voting-lib.fullname" . }}
+          port: {{ .Values.service.port }}
+          weight: 1
+        {{- end }}
+      matches:
+        - path:
+            type: PathPrefix
+            value: {{ .Values.httpRoute.pathPrefix | quote }}
+{{- end }}

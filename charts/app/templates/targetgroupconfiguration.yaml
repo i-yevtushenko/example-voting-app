@@ -1,0 +1,24 @@
+{{- if and .Values.httpRoute.enabled .Values.stickiness.enabled .Values.service.enabled (eq (include "voting-lib.gatewayProvider" .) "aws") }}
+apiVersion: gateway.k8s.aws/v1beta1
+kind: TargetGroupConfiguration
+metadata:
+  name: {{ include "voting-lib.fullname" . }}-sticky
+  labels:
+    {{- include "voting-lib.labels" . | nindent 4 }}
+  annotations:
+    {{- include "voting-lib.syncWave" "2" | nindent 4 }}
+spec:
+  targetReference:
+    group: ""
+    kind: Service
+    name: {{ include "voting-lib.fullname" . }}
+  defaultConfiguration:
+    targetType: {{ .Values.stickiness.aws.targetType }}
+    targetGroupAttributes:
+      - key: stickiness.enabled
+        value: "true"
+      - key: stickiness.type
+        value: lb_cookie
+      - key: stickiness.lb_cookie.duration_seconds
+        value: {{ .Values.stickiness.aws.durationSeconds | quote }}
+{{- end }}

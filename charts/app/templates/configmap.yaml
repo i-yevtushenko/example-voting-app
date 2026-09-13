@@ -1,0 +1,17 @@
+{{- if .Values.configMap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "voting-lib.fullname" . }}
+  labels:
+    {{- include "voting-lib.labels" . | nindent 4 }}
+  annotations:
+    {{- include "voting-lib.syncWave" "2" | nindent 4 }}
+data:
+  {{- if .Values.configMap.data }}
+  {{- toYaml .Values.configMap.data | nindent 2 }}
+  {{- end }}
+  {{- range $key, $value := .Values.configMap.env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
