@@ -26,6 +26,10 @@ app.kubernetes.io/name: {{ include "voting-app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
+{{- define "voting-app.syncWave" -}}
+argocd.argoproj.io/sync-wave: {{ . | quote }}
+{{- end }}
+
 {{- define "voting-app.postgresSecretName" -}}
 {{- default (printf "%s-postgres" (include "voting-app.fullname" .)) .Values.externalSecret.targetName }}
 {{- end }}

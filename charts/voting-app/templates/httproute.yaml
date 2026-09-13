@@ -7,7 +7,7 @@ metadata:
     {{- include "voting-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: vote
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    {{- include "voting-app.syncWave" "3" | nindent 4 }}
 spec:
   hostnames:
     {{- toYaml .Values.httpRoute.vote.hostnames | nindent 4 }}
@@ -33,7 +33,7 @@ metadata:
     {{- include "voting-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: result
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    {{- include "voting-app.syncWave" "3" | nindent 4 }}
 spec:
   hostnames:
     {{- toYaml .Values.httpRoute.result.hostnames | nindent 4 }}

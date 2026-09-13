@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "voting-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: db
+  annotations:
+    {{- include "voting-app.syncWave" "0" | nindent 4 }}
 data:
   create-app-user.sh: |
     #!/bin/bash

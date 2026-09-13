@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "voting-app.labels" . | nindent 4 }}
     app.kubernetes.io/component: vote
+  annotations:
+    {{- include "voting-app.syncWave" "2" | nindent 4 }}
 spec:
   replicas: {{ .Values.vote.replicaCount }}
   selector:
