@@ -2,12 +2,12 @@
 vote:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/vote
-    tag: latest
+    tag: 5607f49
 result:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
-    tag: latest
+    tag: 5607f49
 worker:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/worker
-    tag: latest
+    tag: 5607f49
