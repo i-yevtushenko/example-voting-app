@@ -26,26 +26,14 @@ global:
 vote:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/vote
-<<<<<<< HEAD
     tag: "879e328"
-=======
-    tag: "1562076"
->>>>>>> 9c3459e (split chart)
 
 result:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
-<<<<<<< HEAD
     tag: "879e328"
-=======
-    tag: "1562076"
->>>>>>> 9c3459e (split chart)
 
 worker:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/worker
-<<<<<<< HEAD
     tag: "879e328"
-=======
-    tag: "1562076"
->>>>>>> 9c3459e (split chart)
