@@ -26,14 +26,14 @@ global:
 vote:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/vote
-    tag: "879e328"
+    tag: "eaa868a"
 
 result:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
-    tag: "879e328"
+    tag: "eaa868a"
 
 worker:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/worker
-    tag: "879e328"
+    tag: "eaa868a"
