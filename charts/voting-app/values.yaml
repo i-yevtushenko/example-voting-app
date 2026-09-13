@@ -1,0 +1,86 @@
+nameOverride: ""
+fullnameOverride: ""
+
+imagePullSecrets: []
+
+vote:
+  replicaCount: 2
+  image:
+    repository: ghcr.io/i-yevtushenko/example-voting-app/vote
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8080
+    targetPort: 80
+    nodePort: 31000
+
+result:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/i-yevtushenko/example-voting-app/result
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 8081
+    targetPort: 80
+    nodePort: 31001
+
+worker:
+  replicaCount: 2
+  image:
+    repository: ghcr.io/i-yevtushenko/example-voting-app/worker
+    tag: latest
+    pullPolicy: IfNotPresent
+
+redis:
+  image:
+    repository: redis
+    tag: 7.4.11-alpine
+    pullPolicy: IfNotPresent
+  service:
+    port: 6379
+  persistence:
+    storageClass: synology-iscsi-ssd
+    size: 1Gi
+    accessMode: ReadWriteOnce
+
+db:
+  image:
+    repository: postgres
+    tag: 17.11-alpine
+    pullPolicy: IfNotPresent
+  service:
+    port: 5432
+  persistence:
+    storageClass: synology-iscsi-ssd
+    size: 1Gi
+    accessMode: ReadWriteOnce
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: traefik
+      namespace: traefik
+      sectionName: websecure
+  vote:
+    hostnames:
+      - vote.k8s.local
+  result:
+    hostnames:
+      - result.k8s.local
+
+externalSecret:
+  refreshInterval: 1h
+  secretStore:
+    kind: ClusterSecretStore
+    name: akeyless
+  remoteKey: /k8s/voting-app/postgres
+  targetName: ""
+  properties:
+    username: username
+    password: password
+    rootPassword: root-password
