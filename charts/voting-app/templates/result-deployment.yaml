@@ -30,3 +30,5 @@ spec:
           ports:
             - name: result
               containerPort: 80
+          env:
+            {{- include "voting-app.postgresAppEnv" . | nindent 12 }}

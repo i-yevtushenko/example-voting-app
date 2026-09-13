@@ -27,3 +27,5 @@ spec:
         - name: worker
           image: {{ include "voting-app.image" (dict "root" . "component" .Values.worker) }}
           imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+          env:
+            {{- include "voting-app.postgresAppEnv" . | nindent 12 }}

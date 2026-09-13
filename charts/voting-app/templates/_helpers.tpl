@@ -38,3 +38,20 @@ argocd.argoproj.io/sync-wave: {{ . | quote }}
 {{- $tag := default .root.Chart.AppVersion .component.image.tag }}
 {{- printf "%s:%s" .component.image.repository $tag }}
 {{- end }}
+
+{{- define "voting-app.postgresAppEnv" -}}
+- name: POSTGRES_HOST
+  value: db
+- name: POSTGRES_DB
+  value: postgres
+- name: POSTGRES_USER
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "voting-app.postgresSecretName" . }}
+      key: username
+- name: POSTGRES_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "voting-app.postgresSecretName" . }}
+      key: password
+{{- end }}
