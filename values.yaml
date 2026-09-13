@@ -24,14 +24,14 @@ redis:
 vote:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/vote
-    tag: 1562076
+    tag: "879e328"
 
 result:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/result
-    tag: 1562076
+    tag: "879e328"
 
 worker:
   image:
     repository: ghcr.io/i-yevtushenko/example-voting-app/worker
-    tag: 1562076
+    tag: "879e328"
