@@ -10,7 +10,7 @@ metadata:
     {{- include "voting-app.syncWave" "3" | nindent 4 }}
 spec:
   hostnames:
-    {{- toYaml .Values.httpRoute.vote.hostnames | nindent 4 }}
+    - {{ .Values.domains.vote | quote }}
   parentRefs:
     {{- toYaml .Values.httpRoute.parentRefs | nindent 4 }}
   rules:
@@ -36,7 +36,7 @@ metadata:
     {{- include "voting-app.syncWave" "3" | nindent 4 }}
 spec:
   hostnames:
-    {{- toYaml .Values.httpRoute.result.hostnames | nindent 4 }}
+    - {{ .Values.domains.result | quote }}
   parentRefs:
     {{- toYaml .Values.httpRoute.parentRefs | nindent 4 }}
   rules:

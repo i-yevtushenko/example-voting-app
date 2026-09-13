@@ -29,3 +29,4 @@ spec:
           imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
           env:
             {{- include "voting-app.postgresAppEnv" . | nindent 12 }}
+            {{- include "voting-app.redisAppEnv" . | nindent 12 }}

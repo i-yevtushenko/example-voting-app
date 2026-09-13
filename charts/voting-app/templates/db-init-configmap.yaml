@@ -1,3 +1,4 @@
+{{- if .Values.db.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -27,3 +28,4 @@ data:
     );
     GRANT ALL ON TABLE votes TO ${POSTGRES_APP_USER};
     EOSQL
+{{- end }}

@@ -3,6 +3,10 @@ fullnameOverride: ""
 
 imagePullSecrets: []
 
+domains:
+  vote: vote.k8s.local
+  result: result.k8s.local
+
 vote:
   replicaCount: 2
   image:
@@ -35,6 +39,7 @@ worker:
     pullPolicy: IfNotPresent
 
 redis:
+  enabled: true
   image:
     repository: redis
     tag: 7.4.11-alpine
@@ -47,6 +52,7 @@ redis:
     accessMode: ReadWriteOnce
 
 db:
+  enabled: true
   image:
     repository: postgres
     tag: 17.11-alpine
@@ -66,12 +72,6 @@ httpRoute:
       name: traefik
       namespace: traefik
       sectionName: websecure
-  vote:
-    hostnames:
-      - vote.k8s.local
-  result:
-    hostnames:
-      - result.k8s.local
 
 externalSecret:
   refreshInterval: 1h
@@ -84,3 +84,11 @@ externalSecret:
     username: username
     password: password
     rootPassword: root-password
+    host: host
+    port: port
+  redis:
+    remoteKey: /k8s/voting-app/redis
+    targetName: ""
+    properties:
+      host: host
+      port: port

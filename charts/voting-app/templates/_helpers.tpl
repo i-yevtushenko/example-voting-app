@@ -34,14 +34,33 @@ argocd.argoproj.io/sync-wave: {{ . | quote }}
 {{- default (printf "%s-postgres" (include "voting-app.fullname" .)) .Values.externalSecret.targetName }}
 {{- end }}
 
+{{- define "voting-app.redisSecretName" -}}
+{{- default (printf "%s-redis" (include "voting-app.fullname" .)) .Values.externalSecret.redis.targetName }}
+{{- end }}
+
 {{- define "voting-app.image" -}}
 {{- $tag := default .root.Chart.AppVersion .component.image.tag }}
 {{- printf "%s:%s" .component.image.repository $tag }}
 {{- end }}
 
 {{- define "voting-app.postgresAppEnv" -}}
+{{- if .Values.db.enabled }}
 - name: POSTGRES_HOST
   value: db
+- name: POSTGRES_PORT
+  value: {{ .Values.db.service.port | quote }}
+{{- else }}
+- name: POSTGRES_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "voting-app.postgresSecretName" . }}
+      key: host
+- name: POSTGRES_PORT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "voting-app.postgresSecretName" . }}
+      key: port
+{{- end }}
 - name: POSTGRES_DB
   value: postgres
 - name: POSTGRES_USER
@@ -54,4 +73,24 @@ argocd.argoproj.io/sync-wave: {{ . | quote }}
     secretKeyRef:
       name: {{ include "voting-app.postgresSecretName" . }}
       key: password
+{{- end }}
+
+{{- define "voting-app.redisAppEnv" -}}
+{{- if .Values.redis.enabled }}
+- name: REDIS_HOST
+  value: redis
+- name: REDIS_PORT
+  value: {{ .Values.redis.service.port | quote }}
+{{- else }}
+- name: REDIS_HOST
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "voting-app.redisSecretName" . }}
+      key: host
+- name: REDIS_PORT
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "voting-app.redisSecretName" . }}
+      key: port
+{{- end }}
 {{- end }}

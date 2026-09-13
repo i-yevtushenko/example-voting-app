@@ -1,3 +1,4 @@
+{{- if .Values.db.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -63,3 +64,4 @@ spec:
           configMap:
             name: {{ include "voting-app.fullname" . }}-postgres-init
             defaultMode: 0755
+{{- end }}

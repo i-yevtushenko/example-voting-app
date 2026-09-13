@@ -17,7 +17,7 @@ namespace Worker
             try
             {
                 var pgsql = OpenDbConnection(GetDbConnectionString());
-                var redisConn = OpenRedisConnection("redis");
+                var redisConn = OpenRedisConnection(GetRedisHost());
                 var redis = redisConn.GetDatabase();
 
                 // Keep alive is not implemented in Npgsql yet. This workaround was recommended:
@@ -34,7 +34,7 @@ namespace Worker
                     // Reconnect redis if down
                     if (redisConn == null || !redisConn.IsConnected) {
                         Console.WriteLine("Reconnecting Redis");
-                        redisConn = OpenRedisConnection("redis");
+                        redisConn = OpenRedisConnection(GetRedisHost());
                         redis = redisConn.GetDatabase();
                     }
                     string json = redis.ListLeftPopAsync("votes").Result;
@@ -69,11 +69,18 @@ namespace Worker
         private static string GetDbConnectionString()
         {
             var host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "db";
+            var port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
             var user = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres";
             var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "postgres";
             var database = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "postgres";
-            return $"Server={host};Username={user};Password={password};Database={database};";
+            return $"Server={host};Port={port};Username={user};Password={password};Database={database};";
         }
+
+        private static string GetRedisHost()
+            => Environment.GetEnvironmentVariable("REDIS_HOST") ?? "redis";
+
+        private static string GetRedisPort()
+            => Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
 
         private static NpgsqlConnection OpenDbConnection(string connectionString)
         {
@@ -122,7 +129,7 @@ namespace Worker
                 try
                 {
                     Console.Error.WriteLine("Connecting to redis");
-                    return ConnectionMultiplexer.Connect(ipAddress);
+                    return ConnectionMultiplexer.Connect($"{ipAddress}:{GetRedisPort()}");
                 }
                 catch (RedisConnectionException)
                 {

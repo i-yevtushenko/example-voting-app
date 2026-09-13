@@ -1,0 +1,37 @@
+domains:
+  vote: vote.k8s.local
+  result: result.k8s.local
+
+db:
+  enabled: true
+
+redis:
+  enabled: true
+
+# AWS example (Secrets Manager via External Secrets):
+# db:
+#   enabled: false
+# redis:
+#   enabled: false
+# externalSecret:
+#   secretStore:
+#     kind: ClusterSecretStore
+#     name: aws-secretsmanager
+#   remoteKey: voting-app/postgres
+#   redis:
+#     remoteKey: voting-app/redis
+
+vote:
+  image:
+    repository: ghcr.io/i-yevtushenko/example-voting-app/vote
+    tag: cce2284
+
+result:
+  image:
+    repository: ghcr.io/i-yevtushenko/example-voting-app/result
+    tag: cce2284
+
+worker:
+  image:
+    repository: ghcr.io/i-yevtushenko/example-voting-app/worker
+    tag: cce2284

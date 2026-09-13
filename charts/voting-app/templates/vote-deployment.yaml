@@ -30,3 +30,5 @@ spec:
           ports:
             - name: vote
               containerPort: 80
+          env:
+            {{- include "voting-app.redisAppEnv" . | nindent 12 }}
