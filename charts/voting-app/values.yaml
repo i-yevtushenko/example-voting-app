@@ -100,7 +100,7 @@ redis:
     tag: 7.4.11-alpine
     pullPolicy: IfNotPresent
   customAnnotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "2"
   storage:
     requestedSize: 1Gi
     className: synology-iscsi-ssd
@@ -129,7 +129,7 @@ postgres:
       drop:
         - ALL
   customAnnotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "2"
   settings:
     existingSecret: voting-app-postgres
     superuserPassword:

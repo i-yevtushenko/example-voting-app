@@ -12,7 +12,7 @@ metadata:
   labels:
     {{- include "voting-lib.labels" . | nindent 4 }}
   annotations:
-    {{- include "voting-lib.syncWave" "3" | nindent 4 }}
+    {{- include "voting-lib.syncWave" "4" | nindent 4 }}
 spec:
   hostnames:
     - {{ $hostname | quote }}
