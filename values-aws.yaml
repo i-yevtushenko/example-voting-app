@@ -44,6 +44,7 @@ externalSecret:
 
 vote:
   replicaCount: 2
+  podAntiAffinity: true
   resources:
     requests:
       cpu: 200m
@@ -67,6 +68,7 @@ vote:
 
 result:
   replicaCount: 2
+  podAntiAffinity: true
   resources:
     requests:
       cpu: 150m
@@ -90,6 +92,7 @@ result:
 
 worker:
   replicaCount: 2
+  podAntiAffinity: true
   resources:
     requests:
       cpu: 50m

@@ -66,6 +66,15 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      {{- if .Values.podAntiAffinity }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  {{- include "voting-lib.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -49,6 +49,8 @@ configMap:
 
 resources: {}
 
+podAntiAffinity: false
+
 nodeSelector: {}
 
 tolerations: []
