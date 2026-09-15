@@ -1,12 +1,14 @@
-# AWS overlay. Use with values.yaml:
-#   helm template voting-app charts/voting-app -f values.yaml -f values-aws.yaml
+# AWS overlay. Use with the chart defaults (not values.yaml):
+#   helm template voting-app charts/voting-app -f values-aws.yaml
 #
 # This chart does not install AWS Load Balancer Controller or its Gateway.
 # Install those on the cluster first, then point parentRefs at that Gateway.
 # Result stickiness is TargetGroupConfiguration on the Service (cookie -> pod).
 #
-# Hosted RDS / ElastiCache: db/redis stay off; put host/port (and Postgres
-# username/password) in Secrets Manager.
+# Hosted RDS + ElastiCache. In-cluster db/redis charts stay off; vote/worker/result
+# get host/port (and Postgres user/password) from Secrets Manager via ExternalSecret.
+#   cool/postgres-app  — RDS
+#   cool/redis         — ElastiCache
 
 db:
   enabled: false
@@ -15,8 +17,12 @@ redis:
   enabled: false
 
 global:
+  domains:
+    vote: vote.test-task.drunk.guru
+    result: result.test-task.drunk.guru
   db:
     enabled: false
+    database: app
   redis:
     enabled: false
   gateway:
@@ -32,6 +38,51 @@ externalSecret:
   secretStore:
     kind: ClusterSecretStore
     name: aws-secretsmanager
-  remoteKey: voting-app/postgres
+  remoteKey: cool/postgres-app
   redis:
-    remoteKey: voting-app/redis
+    remoteKey: cool/redis
+
+vote:
+  replicaCount: 1
+  image:
+    repository: 112334179404.dkr.ecr.us-east-1.amazonaws.com/cool/vote
+    tag: "80d730e"
+  service:
+    type: ClusterIP
+    nodePort: null
+  nodeSelector:
+    role: app
+  tolerations:
+    - key: role
+      operator: Equal
+      value: app
+      effect: NoSchedule
+
+result:
+  replicaCount: 1
+  image:
+    repository: 112334179404.dkr.ecr.us-east-1.amazonaws.com/cool/result
+    tag: "80d730e"
+  service:
+    type: ClusterIP
+    nodePort: null
+  nodeSelector:
+    role: app
+  tolerations:
+    - key: role
+      operator: Equal
+      value: app
+      effect: NoSchedule
+
+worker:
+  replicaCount: 1
+  image:
+    repository: 112334179404.dkr.ecr.us-east-1.amazonaws.com/cool/worker
+    tag: "80d730e"
+  nodeSelector:
+    role: app
+  tolerations:
+    - key: role
+      operator: Equal
+      value: app
+      effect: NoSchedule
