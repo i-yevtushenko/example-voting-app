@@ -54,7 +54,8 @@ vote:
       memory: 384Mi
   image:
     repository: 112334179404.dkr.ecr.us-east-1.amazonaws.com/cool/vote
-    tag: "80d730e"
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     nodePort: null
@@ -78,7 +79,8 @@ result:
       memory: 384Mi
   image:
     repository: 112334179404.dkr.ecr.us-east-1.amazonaws.com/cool/result
-    tag: "80d730e"
+    tag: latest
+    pullPolicy: Always
   service:
     type: ClusterIP
     nodePort: null
@@ -102,7 +104,8 @@ worker:
       memory: 192Mi
   image:
     repository: 112334179404.dkr.ecr.us-east-1.amazonaws.com/cool/worker
-    tag: "80d730e"
+    tag: latest
+    pullPolicy: Always
   nodeSelector:
     role: app
   tolerations:
